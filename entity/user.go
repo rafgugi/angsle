@@ -6,5 +6,14 @@ type User struct {
 	Username string
 	Name     string
 	Email    string
-	Role     string
+	Role     Role
 }
+
+// Role defines user's role
+type Role string
+
+// role types
+const (
+	RoleAdmin Role = "admin"
+	RoleUser  Role = "user"
+)
