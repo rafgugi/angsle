@@ -15,7 +15,7 @@ type Router struct {
 	*router.Router
 }
 
-// NewRouter initialize new Router instance
+// NewRouter initializes new Router instance, then registers the regs
 func NewRouter(regs ...Registration) (*Router, error) {
 	router := &Router{router.New()}
 	router.HandleMethodNotAllowed = false
