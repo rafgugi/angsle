@@ -58,7 +58,7 @@ func TestShouldAlert(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			b := battery.Battery{Percentage: tc.initial.percentage, IsCharging: tc.initial.isCharging}
+			b := battery.New(tc.initial.percentage, tc.initial.isCharging)
 
 			for _, tt := range tc.overtime {
 				b.Update(tt.percentage, tt.isCharging)
