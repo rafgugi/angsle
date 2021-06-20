@@ -14,8 +14,8 @@ type Battery struct {
 }
 
 // New creates new battery instance
-func New(percentage int, isCharging bool) Battery {
-	return Battery{
+func New(percentage int, isCharging bool) *Battery {
+	return &Battery{
 		Percentage:          percentage,
 		IsCharging:          isCharging,
 		lastAlertPercentage: percentage,
