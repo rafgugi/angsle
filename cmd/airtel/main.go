@@ -15,6 +15,7 @@ func main() {
 
 	var b *battery.Battery
 
+	shouldAlert := false
 	for {
 		fmt.Println("-------------- Login --------------")
 		err := a.Login()
@@ -35,7 +36,8 @@ func main() {
 		b.Update(percentage, isCharging)
 		fmt.Printf("battery: %+v\n", *b)
 
-		if b.ShouldAlert() {
+		if b.ShouldAlert() || shouldAlert {
+			shouldAlert = true
 			alert()
 		}
 
