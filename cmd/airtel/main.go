@@ -15,6 +15,7 @@ func main() {
 
 	var b *battery.Battery
 
+	currentCharging := false
 	shouldAlert := false
 	for {
 		fmt.Println("-------------- Login --------------")
@@ -31,6 +32,12 @@ func main() {
 
 		if b == nil {
 			b = battery.New(percentage, isCharging)
+		}
+
+		// reset alert if charge state updated
+		if currentCharging != isCharging {
+			shouldAlert = false
+			currentCharging = isCharging
 		}
 
 		b.Update(percentage, isCharging)
