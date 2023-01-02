@@ -6,7 +6,7 @@ import (
 
 	"github.com/rafgugi/angsle/battery"
 	"github.com/rafgugi/angsle/entity"
-	"github.com/rafgugi/angsle/internal/repository/airtel"
+	"github.com/rafgugi/angsle/internal/repository/huawei"
 )
 
 const sleepTime = 30
@@ -15,9 +15,8 @@ func main() {
 	var modem entity.Modem
 	var b *battery.Battery
 
-	modem = airtel.Airtel{
-		Host:     "http://192.168.8.1",
-		Password: "admin",
+	modem = huawei.Huawei{
+		Host: "http://192.168.8.1",
 	}
 
 	currentCharging := false
