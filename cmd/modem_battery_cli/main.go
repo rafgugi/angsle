@@ -5,27 +5,25 @@ import (
 	"time"
 
 	"github.com/rafgugi/angsle/battery"
+	"github.com/rafgugi/angsle/entity"
+	"github.com/rafgugi/angsle/internal/repository/airtel"
 )
 
-func main() {
-	a := Airtel{
-		host:     "http://192.168.8.1",
-		password: "admin",
-	}
+const sleepTime = 30
 
+func main() {
+	var modem entity.Modem
 	var b *battery.Battery
+
+	modem = airtel.Airtel{
+		Host:     "http://192.168.8.1",
+		Password: "admin",
+	}
 
 	currentCharging := false
 	shouldAlert := false
 	for {
-		fmt.Println("-------------- Login --------------")
-		err := a.Login()
-		if err != nil {
-			fmt.Println("error: " + err.Error())
-		}
-
-		fmt.Println("-------------- Get Battery Info --------------")
-		percentage, isCharging, err := a.BatteryInfo()
+		percentage, isCharging, err := modem.GetBattery()
 		if err != nil {
 			fmt.Println("error: " + err.Error())
 		}
@@ -49,7 +47,7 @@ func main() {
 		}
 
 		fmt.Println("-------------- Sleep --------------")
-		time.Sleep(30 * time.Second)
+		time.Sleep(sleepTime * time.Second)
 	}
 }
 
