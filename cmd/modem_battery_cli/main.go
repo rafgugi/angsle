@@ -19,8 +19,6 @@ func main() {
 		Host: "http://192.168.8.1",
 	}
 
-	currentCharging := false
-	shouldAlert := false
 	for {
 		percentage, isCharging, err := modem.GetBattery()
 		if err != nil {
@@ -30,18 +28,10 @@ func main() {
 		if b == nil {
 			b = battery.New(percentage, isCharging)
 		}
-
-		// reset alert if charge state updated
-		if currentCharging != isCharging {
-			shouldAlert = false
-			currentCharging = isCharging
-		}
-
 		b.Update(percentage, isCharging)
 		fmt.Printf("battery: %+v\n", *b)
 
-		if b.ShouldAlert() || shouldAlert {
-			shouldAlert = true
+		if b.ShouldAlert() {
 			alert()
 		}
 
