@@ -1,4 +1,4 @@
-package entity
+package modem
 
 import "github.com/rafgugi/angsle/battery"
 
