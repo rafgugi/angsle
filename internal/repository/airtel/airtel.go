@@ -8,11 +8,14 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/rafgugi/angsle/battery"
 )
 
 type Airtel struct {
-	Host     string
-	Password string
+	host     string
+	password string
+	battery  *battery.Battery
 }
 
 type batteryResponse struct {
@@ -20,9 +23,18 @@ type batteryResponse struct {
 	Percentage string `json:"capacity"`
 }
 
+func New(host string, password string) *Airtel {
+	var b *battery.Battery
+	return &Airtel{
+		host:     host,
+		password: password,
+		battery:  b,
+	}
+}
+
 func (a Airtel) login() error {
-	u, _ := url.Parse(fmt.Sprintf("%s/reqproc/proc_post?goformId=LOGIN", a.Host))
-	password := base64.StdEncoding.EncodeToString([]byte(a.Password))
+	u, _ := url.Parse(fmt.Sprintf("%s/reqproc/proc_post?goformId=LOGIN", a.host))
+	password := base64.StdEncoding.EncodeToString([]byte(a.password))
 
 	q := u.Query()
 	q.Set("password", password)
@@ -45,7 +57,7 @@ func (a Airtel) login() error {
 }
 
 func (a Airtel) batteryInfo() (int, bool, error) {
-	u, _ := url.Parse(fmt.Sprintf("%s/reqproc/proc_get?cmd=get_battery_info", a.Host))
+	u, _ := url.Parse(fmt.Sprintf("%s/reqproc/proc_get?cmd=get_battery_info", a.host))
 	req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
 
 	resp, err := http.DefaultClient.Do(req)
@@ -75,18 +87,24 @@ func (a Airtel) batteryInfo() (int, bool, error) {
 	return percentage, isCharging, nil
 }
 
-func (a Airtel) GetBattery() (int, bool, error) {
+func (a *Airtel) UpdateBattery() error {
 	fmt.Println("-------------- Login --------------")
 	err := a.login()
 	if err != nil {
-		return 0, false, err
+		return err
 	}
 
 	fmt.Println("-------------- Get Battery Info --------------")
 	percentage, isCharging, err := a.batteryInfo()
 	if err != nil {
-		return 0, false, err
+		return err
 	}
+	a.battery.Update(percentage, isCharging)
 
-	return percentage, isCharging, nil
+	return nil
+}
+
+func (a *Airtel) GetBattery() *battery.Battery {
+	fmt.Printf("battery: %+v\n", a.battery)
+	return a.battery
 }

@@ -7,10 +7,13 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/rafgugi/angsle/battery"
 )
 
 type Huawei struct {
-	Host string
+	host    string
+	battery *battery.Battery
 }
 
 type statusResponse struct {
@@ -18,8 +21,16 @@ type statusResponse struct {
 	Percentage string `xml:"BatteryPercent"`
 }
 
+func New(host string) *Huawei {
+	var b *battery.Battery
+	return &Huawei{
+		host:    host,
+		battery: b,
+	}
+}
+
 func (h Huawei) getStatus() (statusResponse, error) {
-	u, _ := url.Parse(fmt.Sprintf("%s/api/monitoring/status", h.Host))
+	u, _ := url.Parse(fmt.Sprintf("%s/api/monitoring/status", h.host))
 	req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
 	req.Header.Set("Update-Cookie", "UpdateCookie")
 
@@ -40,22 +51,31 @@ func (h Huawei) getStatus() (statusResponse, error) {
 	return raw, nil
 }
 
-func (h Huawei) GetBattery() (int, bool, error) {
+func (h *Huawei) UpdateBattery() error {
 	fmt.Println("-------------- Get Status --------------")
 	raw, err := h.getStatus()
 	if err != nil {
-		return 0, false, err
+		return err
 	}
 
 	percentage, err := strconv.Atoi(raw.Percentage)
 	if err != nil {
-		return 0, false, err
+		return err
 	}
 
 	isCharging := false
 	if raw.IsCharging == "1" {
 		isCharging = true
 	}
+	if h.battery == nil {
+		h.battery = battery.New(percentage, isCharging)
+	}
 
-	return percentage, isCharging, nil
+	h.battery.Update(percentage, isCharging)
+	return nil
+}
+
+func (h *Huawei) GetBattery() *battery.Battery {
+	fmt.Printf("battery: %+v\n", h.battery)
+	return h.battery
 }
