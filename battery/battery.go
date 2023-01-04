@@ -5,7 +5,8 @@ var (
 	alertPercentWhenNotCharging = 20
 )
 
-// Battery is a battery of a device
+// Battery is a battery that has capacity up to 100%. It will be decreased
+// overtime, but can be increased by charging
 type Battery struct {
 	Percentage int
 	IsCharging bool
