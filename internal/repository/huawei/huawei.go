@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/rafgugi/angsle/battery"
+	"github.com/rafgugi/angsle/modem"
 )
 
 type Huawei struct {
@@ -19,6 +20,10 @@ type Huawei struct {
 type statusResponse struct {
 	IsCharging string `xml:"usbup"`
 	Percentage string `xml:"BatteryPercent"`
+}
+
+func isModem() {
+	var _ modem.Modem = (*Huawei)(nil)
 }
 
 func New(host string) *Huawei {

@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/rafgugi/angsle/battery"
+	"github.com/rafgugi/angsle/modem"
 )
 
 type Airtel struct {
@@ -21,6 +22,10 @@ type Airtel struct {
 type batteryResponse struct {
 	IsCharging string `json:"charging"`
 	Percentage string `json:"capacity"`
+}
+
+func isModem() {
+	var _ modem.Modem = (*Airtel)(nil)
 }
 
 func New(host string, password string) *Airtel {
