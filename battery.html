@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link id="icon" href="" rel="shortcut icon" />
+  <title id="title">Battery</title>
+</head>
+<body>
+  <pre id="box"></pre>
+  <script>
+    "use strict";
+    const icon_error = 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/apple-medium/274c@2x.png';
+    const icon_charging = 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/apple-medium/1f604@2x.png';
+    const icon_charging_alert = 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/apple-medium/1f628@2x.png';
+    const icon_charging_max = 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/apple-medium/1f621@2x.png';
+    const icon_discharging = 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/apple-medium/1f642@2x.png';
+    const icon_discharging_alert = 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/apple-medium/1f915@2x.png';
+    const icon_discharging_max = 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/apple-medium/1f635@2x.png';
+
+    var icon = document.getElementById('icon');
+    var box = document.getElementById('box');
+    var title = document.getElementById('title');
+
+    function updateBattery() {
+      var req = new XMLHttpRequest();
+      req.onreadystatechange = function(){
+        if (req.readyState == XMLHttpRequest.DONE) {
+          var res = req.response;
+          box.innerHTML = JSON.stringify(res);
+          if (req.status == 200) {
+            title.innerHTML = (res.is_charging ? 'ϟ' : '') + res.percentage + '%';
+            if (res.is_charging) {
+              if (res.percentage == 100) {
+                icon.href = icon_charging_max;
+              } else if (res.should_alert) {
+                icon.href = icon_charging_alert;
+              } else {
+                icon.href = icon_charging;
+              }
+            } else {
+              if (res.percentage == 0) {
+                icon.href = icon_discharging_max;
+              } else if (res.should_alert) {
+                icon.href = icon_discharging_alert;
+              } else {
+                icon.href = icon_discharging;
+              }
+            }
+          } else {
+            title.innerHTML = 'X';
+            icon.href = icon_error;
+          }
+        }
+      }
+      req.responseType = 'json';
+      req.open('GET', '/api/battery', true);
+      req.send();
+    }
+
+    updateBattery();
+    setInterval(updateBattery, 30000);
+  </script>
+</body>
+</html>
