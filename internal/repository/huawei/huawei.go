@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strconv"
 
 	"github.com/rafgugi/angsle/battery"
 	"github.com/rafgugi/angsle/modem"
@@ -19,7 +18,7 @@ type Huawei struct {
 
 type statusResponse struct {
 	IsCharging string `xml:"usbup"`
-	Percentage string `xml:"BatteryPercent"`
+	Percentage int    `xml:"BatteryPercent"`
 }
 
 func isModem() {
@@ -60,11 +59,7 @@ func (h *Huawei) UpdateBattery() error {
 	fmt.Println("-------------- Get Status --------------")
 	raw, err := h.getStatus()
 	if err != nil {
-		return err
-	}
-
-	percentage, err := strconv.Atoi(raw.Percentage)
-	if err != nil {
+		h.battery = nil
 		return err
 	}
 
@@ -73,10 +68,11 @@ func (h *Huawei) UpdateBattery() error {
 		isCharging = true
 	}
 	if h.battery == nil {
-		h.battery = battery.New(percentage, isCharging)
+		h.battery = battery.New(raw.Percentage, isCharging)
+	} else {
+		h.battery.Update(raw.Percentage, isCharging)
 	}
 
-	h.battery.Update(percentage, isCharging)
 	return nil
 }
 
